@@ -8,11 +8,11 @@ router.get('/', (req, res) => {
     req.app.locals.db.collection("users").find().toArray()
 
     .then(users => {
-    users.forEach(user => {
-        user.id = user._id;
-        delete user._id;
-        delete user.password;
-    });
+        users.forEach(user => {
+         user.id = user._id;
+            delete user._id;
+            delete user.password;
+         });
     res.json(users);
   });
 });
@@ -20,8 +20,6 @@ router.get('/', (req, res) => {
 // get specific user - id, name, email, password
 router.post('/', (req, res) => {
     let id = req.body.id;
-
-    console.log(id);
 
     req.app.locals.db.collection("users").findOne({_id:new ObjectId(id)})
     .then(user => {
