@@ -18,7 +18,7 @@ Det är helt ok att skapa alla produkter med “mock” data, samt att för des
 
 ### Skillnader mellan G och VG krav:
 
-För kravet G så behöver inte anänvdarens lösenord krypteras. 
+För kravet G så behöver inte användarens lösenord krypteras. 
 
 För VG så behöver användarens lösenord i endpointen krypteras innan det sparas i databasen. Samt så skall alla administratörs endpoints skyddas med en API nyckel, dvs om inte rätt nyckel skickas med i POST body, eller som param i GET, så skall inte anropet hanteras av servern utan istället svara med en statuskod 401 (unauthorized) och lämna ett passande medelande ({“message”: “Not Authorized”). 
 

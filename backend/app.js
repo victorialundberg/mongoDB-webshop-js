@@ -9,6 +9,16 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
+const MongoClient = require("mongodb").MongoClient;
+
+MongoClient.connect("mongodb://127.0.0.1:27017")
+.then(client => {
+    console.log("Connected!");
+
+    const db = client.db("victoria-lundberg");
+    app.locals.db = db;
+})
+
 app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
@@ -17,13 +27,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/api/users', usersRouter);
 
-// Flytta till routes?
-app.get("/products", (req, res) => {
-    
-    res.json({"prodcut": "product"})
-
-})
 
 module.exports = app;
