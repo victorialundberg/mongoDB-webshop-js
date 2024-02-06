@@ -3,10 +3,15 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const cors = require("cors");
+require('dotenv').config()
+
+console.log("env", process.env.MONGO_SVR);
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var productsRouter = require('./routes/products');
+var ordersRouter = require('./routes/orders');
+const { log } = require('console');
 
 var app = express();
 
@@ -30,6 +35,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/products', productsRouter);
+app.use('/api/orders', ordersRouter);
 
 
 module.exports = app;

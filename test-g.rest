@@ -82,11 +82,11 @@ Content-Type: application/json
   "user": "{{getUsers.response.body.$[0].id}}",
       "products": [
     {
-      "productId": "// ID PÅ EN PRODUKT",
+      "productId": "65bb6fd0f886e4425c39a33a",
       "quantity": 1
     },
     {
-      "productId": "// ID PÅ EN PRODUKT",
+      "productId": "65bb6fd0f886e4425c39a33b",
       "quantity": 2
     }
   ]
