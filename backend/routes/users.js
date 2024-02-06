@@ -1,8 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var ObjectId = require("mongodb").ObjectId;
+const CryptoJS = require("crypto-js");
 
-// get all users - id, name, email
+
 router.get('/', (req, res) => {
 
     req.app.locals.db.collection("users").find().toArray()
@@ -17,7 +18,6 @@ router.get('/', (req, res) => {
   });
 });
 
-// get specific user - id, name, email, password
 router.post('/', (req, res) => {
     let id = req.body.id;
 
@@ -36,13 +36,15 @@ router.post('/', (req, res) => {
   
 });
 
-// create user - name, email, password
+
 router.post('/add', (req, res) => {
+
+    let encryptedPassword = CryptoJS.AES.encrypt(req.body.password, process.env.SALT_KEY).toString();
 
     let user = {
         name: req.body.name,
         email: req.body.email,
-        password: req.body.password
+        password: encryptedPassword
     };
 
 
@@ -55,24 +57,30 @@ router.post('/add', (req, res) => {
   
 });
 
-// login user - email, password
+
 router.post('/login', (req, res) => {
 
-// find user in db
-
 let email = req.body.email;
-let password = req.body.password;
 
-req.app.locals.db.collection("users").findOne({email: email, password: password})
+req.app.locals.db.collection("users").findOne({email: email})
 .then(user => {
     if (user) {
-        user.id = user._id;
-        delete user._id;
-        res.json(user);
+        let decryptedPassword = CryptoJS.AES.decrypt(user.password, process.env.SALT_KEY).toString(CryptoJS.enc.Utf8);
+        if (decryptedPassword === req.body.password) {
+            user.id = user._id;
+            delete user._id;
+            delete user.password;
+            res.json(user);
+        } else {
+            res.status(401).json({message: "Sorry, you can't come in."}); // wrong password
+        }
     } else {
-        res.status(401).json({message: "Sorry, you can't come in."});
+        res.status(401).json({message: "Sorry, you can't come in."}); // wrong username
     }
+
 })
+
+
   
 });
 

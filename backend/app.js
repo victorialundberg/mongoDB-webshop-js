@@ -3,9 +3,10 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const cors = require("cors");
-require('dotenv').config()
+require('dotenv').config();
+const CryptoJS = require("crypto-js");
 
-console.log("env", process.env.MONGO_SVR);
+console.log("env", process.env.MONGO_SRV);
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -17,7 +18,7 @@ var app = express();
 
 const MongoClient = require("mongodb").MongoClient;
 
-MongoClient.connect("mongodb://127.0.0.1:27017")
+MongoClient.connect(process.env.MONGO_SRV)
 .then(client => {
     console.log("Connected!");
 
