@@ -48,12 +48,18 @@ router.post('/add', (req, res) => {
     };
 
 
-    req.app.locals.db.collection("users").insertOne(user);
+    req.app.locals.db.collection("users").insertOne(user)
+    .then(dbUser => {
+        user.id = dbUser.insertedId;
+        delete user._id;
 
-    user.id = user._id;
-    delete user._id;
+        res.json(user);
+    }
+    )
 
-    res.json(user);
+
+    // user.id = user._id;
+
   
 });
 
