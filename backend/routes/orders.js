@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 var ObjectId = require("mongodb").ObjectId;
 
+// Add order
+
 router.post('/add', (req, res) => {
 
 
@@ -26,11 +28,14 @@ router.post('/add', (req, res) => {
 
 });
 
+// Get all orders
+
 router.get('/all', (req, res) => {
 
+    let key = req.query.apikey;
 
-
-    req.app.locals.db.collection("orders").find().toArray()
+    if (key == process.env.GET_ALL_ORDERS_KEY) {
+        req.app.locals.db.collection("orders").find().toArray()
         .then(orders => {
             orders.forEach(order => {
                 order.id = order._id;
@@ -38,8 +43,39 @@ router.get('/all', (req, res) => {
             });
             res.json(orders);
         })
+    } else {
+        res.status(401).json({message: "You need a key to see all orders!"})
+    }
+
+})
+
+// Get orders for a specific user
+
+router.post('/user', (req, res) => {
+
+    let token = req.body.token;
+
+    if (token) {
+        if (token == process.env.ADD_PRODUCT_TOKEN) {
+            req.app.locals.db.collection("orders").find().toArray()
+            .then(orders => {
+                orders.forEach(order => {
+                    order.id = order._id;
+                    delete order._id;
+                });
+                res.json(orders);
+            })
+        } else {
+            res.status(401).json({message: "You need the right key to see this."})
+        }
+    } else {
+        res.status(401).json({message:"You need a key to see this."})
+    }
+
+
 
 
 })
+
 
 module.exports = router;
