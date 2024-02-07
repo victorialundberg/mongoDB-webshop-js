@@ -40,14 +40,24 @@ router.post('/add', (req, res) => {
         name: req.body.name,
         description: req.body.description,
         price: req.body.price,
-        lager: req.body.price
+        lager: req.body.price,
+        category: req.body.category // koppla till kategori
     };
 
-    req.app.locals.db.collection("products").insertOne(product);
+    let token = req.body.token;
 
-    delete product._id;
+    if (token == process.env.ADD_PRODUCT_TOKEN) {
+        req.app.locals.db.collection("products").insertOne(product);
+        delete product._id;
 
-    res.json(product);
+        res.json(product);
+    } else {
+        res.status(401).json({message:"You are not allowed to add products."})
+    }
+
+    
+
+
 })
 
 
