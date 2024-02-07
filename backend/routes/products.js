@@ -41,7 +41,7 @@ router.post('/add', (req, res) => {
         description: req.body.description,
         price: req.body.price,
         lager: req.body.price,
-        category: req.body.category // koppla till kategori
+        category: req.body.category
     };
 
     let token = req.body.token;
@@ -64,13 +64,16 @@ router.post('/add', (req, res) => {
 
 router.get('/category/:id', (req, res) => {
     
-    req.app.locals.db.collection("producsts").find({"category":req.params.id}).toArray()
-    .then(product => {
-        if (product) {
-            delete product._id;
-            res.json(product);
+    req.app.locals.db.collection("products").find({"category":req.params.id}).toArray()
+    .then(products => {
+        if (products.length > 0) {
+            products.forEach(product => {
+                product.id = product._id;
+                delete product._id;
+            })
+            res.json(products);
         } else {
-            res.status(404).json({message: "No product with that id!"})
+            res.status(404).json({message: "No products within that category!"})
         }
     })
 })
