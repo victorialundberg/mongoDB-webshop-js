@@ -3,7 +3,7 @@ var router = express.Router();
 var ObjectId = require("mongodb").ObjectId;
 const CryptoJS = require("crypto-js");
 
-
+// Get all users
 router.get('/', (req, res) => {
 
     req.app.locals.db.collection("users").find().toArray()
@@ -18,6 +18,7 @@ router.get('/', (req, res) => {
   });
 });
 
+// Get specific user
 router.post('/', (req, res) => {
     let id = req.body.id;
 
@@ -36,7 +37,7 @@ router.post('/', (req, res) => {
   
 });
 
-
+// Add user
 router.post('/add', (req, res) => {
 
     let encryptedPassword = CryptoJS.AES.encrypt(req.body.password, process.env.SALT_KEY).toString();
@@ -50,20 +51,16 @@ router.post('/add', (req, res) => {
 
     req.app.locals.db.collection("users").insertOne(user)
     .then(dbUser => {
-        user.id = dbUser.insertedId;
-        delete user._id;
-
+        user.id = dbUser.insertedId; // Keep if id is necessary, otherwise delete this row,
+        delete user._id;             // and change this to "delete user.id"
+        delete user.password
         res.json(user);
-    }
-    )
-
-
-    // user.id = user._id;
+    })
 
   
 });
 
-
+// Login
 router.post('/login', (req, res) => {
 
 let email = req.body.email;
@@ -73,21 +70,18 @@ req.app.locals.db.collection("users").findOne({email: email})
     if (user) {
         let decryptedPassword = CryptoJS.AES.decrypt(user.password, process.env.SALT_KEY).toString(CryptoJS.enc.Utf8);
         if (decryptedPassword === req.body.password) {
-            user.id = user._id;
-            delete user._id;
+            user.id = user._id;        // Keep if id is necessary, otherwise delete this row,
+            delete user._id;           // and change this to "delete user.id"
             delete user.password;
             res.json(user);
         } else {
-            res.status(401).json({message: "Sorry, you can't come in."}); // wrong password
+            res.status(401).json({message: "Sorry, you can't come in."}); // Wrong password
         }
     } else {
-        res.status(401).json({message: "Sorry, you can't come in."}); // wrong username
+        res.status(401).json({message: "Sorry, you can't come in."}); // Wrong username
     }
 
-})
-
-
-  
+}) 
 });
 
 
