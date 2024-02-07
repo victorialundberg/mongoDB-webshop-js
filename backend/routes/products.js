@@ -60,7 +60,20 @@ router.post('/add', (req, res) => {
 
 })
 
+// Get all products from specific category
 
+router.get('/category/:id', (req, res) => {
+    
+    req.app.locals.db.collection("producsts").find({"category":req.params.id}).toArray()
+    .then(product => {
+        if (product) {
+            delete product._id;
+            res.json(product);
+        } else {
+            res.status(404).json({message: "No product with that id!"})
+        }
+    })
+})
 
 
 module.exports = router;
