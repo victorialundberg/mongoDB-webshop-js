@@ -10,6 +10,74 @@
     <script src="script.js" defer></script>
 </head>
 <body>
-    
+    <header>
+        <nav id="navigation">
+            <div id="UserNavBtns">
+                <!--render in js-->
+                <button id="userActionsBtn" type="button">Login</button> <!--redirect to userPage-->
+                <button id="logoutBtn" type="button">Logout</button> <!--redicrect to homePage-->
+                <!--render in js-->
+            </div>
+            <button id="categoryNavBtn" type="button"></button>
+            <button class="productNavBtn" type="button"></button>
+            <button id="orderNavBtn" type="button"></button>
+        </nav>
+    </header>
+    <main>
+        <div id="homePage"></div>
+        <div id="userContainer">
+            <!--render in js-->
+            <div id="addUserForm">
+                <input type="text" id="userName"> Name
+                <input type="text" id="userEmail"> Email
+                <input type="text" id="userPassword"> Password
+                <button id="saveUserBtn" type="button">Save and login</button>
+            </div>
+            <div id="loginForm">
+                <input type="text" name="" id=""> Email
+                <input type="text" name="" id=""> Password
+                <button type="button">Login</button>
+            </div>
+            <div id="getAllUsers">
+                <button>Get all users</button>
+            </div>
+            <div id="getUser">
+                <input type="text" id="userId">
+                <button id="getUserBtn" type="button">Get user</button>
+            </div>
+            <!--render in js-->
+        </div>
+        <div id="categoryContainer">
+            <!--render in js-->
+            <button id="categoryBtn" type="button">Category name</button>
+            <!--render in js-->
+        </div>
+        <div id="allProductsContainer">
+            <!--render in js-->
+            <div id="allProductsWrapper">
+                <img src="" alt="">
+                <span id="productName"></span>
+
+                <div id="productBtnContainer">
+                    <button id="addToCartBtn"></button>
+                    <button id="showProductBtn"></button> <!--redirect to productpage-->
+                </div>
+            </div>
+            <!--render in js-->
+        </div>
+        <div id="productContainer">
+            <!--render in js-->
+            <img src="" alt="">
+            <span id="productName"></span>
+            <span id="productDescription"></span>
+            <span id="productPrice"></span>
+            <span id="productCategory"></span>
+
+            <button class="productNavBtn"></button>
+            <!--render in js-->
+        </div>
+        <div id="orderContainer"></div>
+        <div id="errorContainer"></div>
+    </main>
 </body>
 </html>
