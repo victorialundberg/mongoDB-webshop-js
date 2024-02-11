@@ -34,8 +34,14 @@
                 Password<input type="password" id="loginPassword">
                 <button onClick="loginUserFunction()" type="button">Login</button>
             </div><hr/>
+            <div>
+                <input id="getMyOrdersToken" type="password" placeholder="token">
+                <button onClick="getMyOrders()">Show my orders</button><hr/>
+            </div>
+
             <!----------------------Products---------------------->
             <button id="getAllProductsBtn">Get all products</button><hr/>
+            <button id="getAllCategoriesBtn">Get all products per category</button><hr/>
             <div id="addProductForm">
                 Name <input type="text" id="productNameInput"> <br/>
                 Description<input type="text" id="productDescriptionInput"> <br/>
