@@ -186,6 +186,8 @@ function loginUserFunction() {
         });
 }
 
+// Logout user
+
 function logout() {
     localStorage.removeItem("currentUser");
     loginForm.innerHTML = `
@@ -198,12 +200,10 @@ function logout() {
     `
 }
 
-
 //-----------------------Products----------------------\\
 
 // Get products
 
-let allProducts;
 
 let getAllProductsBtn = document.getElementById("getAllProductsBtn");
 let image = {
@@ -219,14 +219,21 @@ function getAllProductsFunction() {
 
     fetch('http://localhost:3000/api/products')
         .then(res => res.json())
-        .then(data => {
-            allProducts = data;
-            let table = `<table>`;
-            data.forEach(product => {
+        .then(allProducts => {
+            let table = `<table>
+                            <tr>
+                                <th>Image</th>
+                                <th>Price</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                            </tr>`;
+            allProducts.forEach(product => {
                 table += `
                 <tr>
                     <td><img src="${image.src}" alt="${image.alt}" width="${image.width}" height="${image.height}"></img></td>
-                    <td>Name: ${product.name}</td>
+                    <td>${product.price}</td>
+                    <td>${product.name}</td>
+                    <td>${product.category}</td>
                     <td>
                         <button onClick="showProductFunction('${product.id}')">Show product</button>
                     </td>
@@ -237,6 +244,65 @@ function getAllProductsFunction() {
             renderedContent.innerHTML = table;
         });
 };
+
+// Get categories
+
+let getAllCategoriesBtn = document.getElementById("getAllCategoriesBtn");
+
+getAllCategoriesBtn.addEventListener("click", getAllCategoriesFunction);
+
+
+function getAllCategoriesFunction() {
+
+    fetch('http://localhost:3000/api/categories')
+        .then(res => res.json())
+        .then(categories => {
+            let output = ``
+            categories.forEach(category => {
+                output += `
+                        <h1>
+                            ${category.name}
+                        </h1>
+                        <div id="${category.id}"></div>
+                        `
+
+            })
+            renderedContent.innerHTML = output;
+            categories.forEach(category => {
+                fetch('http://localhost:3000/api/products/category/' + category.id)
+                    .then(res => {
+                        if (!res.ok) {
+                            return res.json().then(data => {
+                                return Promise.reject(new Error(data.message));
+                            });
+                        } else {
+                            return res.json();
+                        }
+
+                    })
+                    .then(products => {
+                        let productsHtml = `<table>`
+                        products.forEach(product => {
+                            productsHtml += `
+                                <tr>
+                                    <td><img src="${image.src}" alt="${image.alt}" width="${image.width}" height="${image.height}"></img></td>
+                                    <td>${product.price}</td>
+                                    <td>${product.name}</td>
+                                    <td>${product.category}</td>
+                                    <td>
+                                        <button onClick="showProductFunction('${product.id}')">Show product</button>
+                                    </td>
+                                </tr>
+                                `
+                        })
+                        productsHtml += `</table>`;
+                        document.getElementById(category.id).innerHTML = productsHtml;
+                    }).catch(ignore => {
+                    });
+            })
+        })
+
+}
 
 // Get product
 
@@ -266,10 +332,14 @@ function showProductFunction(productId) {
 function updateCartFunction(productId) {
     let updateCartInput = document.getElementById("updateCartInput");
     let productQuantity = updateCartInput.value;
-    
+
     let shoppingCart = getShoppingCart();
 
-    shoppingCart[productId] = productQuantity;
+    if (+productQuantity) {
+        shoppingCart[productId] = productQuantity;
+    } else { 
+        delete shoppingCart[productId]; 
+    }
     localStorage.setItem("shoppingCart", JSON.stringify(shoppingCart));
 }
 
@@ -296,31 +366,37 @@ function shoppingCartFunction() {
 
     if (Object.keys(shoppingCart).length > 0) {
 
-        let displayShoppingCart = `<table>
+        fetch('http://localhost:3000/api/products')
+            .then(res => res.json())
+            .then(allProducts => {
+                let displayShoppingCart = `<table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Price per unit</th>
+                        <th>Quantity</th>
+                    </tr>
+                `;
+
+                for (let productId in shoppingCart) {
+
+                    let product = allProducts.find(p => p.id == productId)
+                    displayShoppingCart += `
                         <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Price per unit</th>
-                            <th>Quantity</th>
+                            <td>${product.name}</td>
+                            <td>${product.description}</td>
+                            <td>${product.price}</td>
+                            <td>${shoppingCart[productId]}</td>
                         </tr>
                     `;
+                };
 
-        for (let productId in shoppingCart) {
+                displayShoppingCart += `</table>
+                     <button onClick="placeOrder()">Order</button>`;
+                renderedContent.innerHTML = displayShoppingCart;
+            });
 
-            let product = allProducts.find(p => p.id == productId)
-            displayShoppingCart += `
-                <tr>
-                    <td>${product.name}</td>
-                    <td>${product.description}</td>
-                    <td>${product.price}</td>
-                    <td>${shoppingCart[productId]}</td>
-                </tr>
-            `;
-        };
 
-        displayShoppingCart += `</table>
-                                 <button onClick="placeOrder()">Order</button>`;
-        renderedContent.innerHTML = displayShoppingCart;
 
     } else {
         renderedContent.innerHTML = `<p>Shopping cart is empty!</p>`
@@ -357,49 +433,51 @@ function addProductFunction(event) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(product)
     })
-    .then(res => {
-        if (res.status === 401) {
-            return res.json().then(data => {
-                return Promise.reject(new Error(data.message));
-            });
-        } else {
-            return res.json();
-        }
-    })
-    .then(data => {
-        productNameInput.value = "",
-        productDescriptionInput.value = "";
-        productPriceInput.value = "";
-        productLagerInput.value = "";
-        productCategoryInput.value = "";
-        addProductToken.value = "";
-        renderedContent.innerHTML = `
+        .then(res => {
+            if (res.status === 401) {
+                return res.json().then(data => {
+                    return Promise.reject(new Error(data.message));
+                });
+            } else {
+                return res.json();
+            }
+        })
+        .then(data => {
+            productNameInput.value = "",
+                productDescriptionInput.value = "";
+            productPriceInput.value = "";
+            productLagerInput.value = "";
+            productCategoryInput.value = "";
+            addProductToken.value = "";
+            renderedContent.innerHTML = `
         <p>The product ${data.name} has been added</p>
         `
-    })
-    .catch(error => {
-        console.error("Error:", error.message);
-        renderedContent.innerHTML = `
+        })
+        .catch(error => {
+            console.error("Error:", error.message);
+            renderedContent.innerHTML = `
         <p>${error.message}</p>
     `
-    });
+        });
 
 }
 
 //-------------------------Order------------------------\\
 
+// Place order
+
 function placeOrder() {
 
     let order = {
         user: localStorage.getItem("currentUser"),
-            products: []
+        products: []
     }
 
     let shoppingCart = getShoppingCart();
 
     for (let productId in shoppingCart) {
 
-        order.products.push({productId: productId, quantity: shoppingCart[productId]})
+        order.products.push({ productId: productId, quantity: shoppingCart[productId] })
     }
 
     fetch('http://localhost:3000/api/orders/add', {
@@ -407,27 +485,27 @@ function placeOrder() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(order)
     })
-    .then(res => {
-        if (res.status === 400) {
-            return res.json().then(data => {
-                return Promise.reject(new Error(data.message));
-            });
-        } else {
-            return res.json();
-        }
-    })
-    .then(data => {
-        renderedContent.innerHTML = `
+        .then(res => {
+            if (res.status === 400) {
+                return res.json().then(data => {
+                    return Promise.reject(new Error(data.message));
+                });
+            } else {
+                return res.json();
+            }
+        })
+        .then(data => {
+            renderedContent.innerHTML = `
     <p>Your order has been placed</p>
     `
-    localStorage.removeItem("shoppingCart")
-    })
-    .catch(error => {
-        console.error("Error:", error.message);
-        renderedContent.innerHTML = `
+            localStorage.removeItem("shoppingCart")
+        })
+        .catch(error => {
+            console.error("Error:", error.message);
+            renderedContent.innerHTML = `
     <p>${error.message}</p>
     `
-    });
+        });
 
 }
 
@@ -439,48 +517,110 @@ let getAllOrdersBtn = document.getElementById("getAllOrdersBtn");
 getAllOrdersBtn.addEventListener("click", getAllOrders);
 
 function getAllOrders() {
-    fetch('http://localhost:3000/api/orders/all?apikey='+allOrdersInput.value)
-    .then(res => {
-        if (res.status === 401) {
-            return res.json().then(data => {
-                return Promise.reject(new Error(data.message));
-            });
-        } else {
-            return res.json();
-        }
-    })
-    .then(data => {
-        let orders = `<table>`
-        data.forEach(order => {
-            orders += `
+    fetch('http://localhost:3000/api/orders/all?apikey=' + allOrdersInput.value)
+        .then(res => {
+            if (res.status === 401) {
+                return res.json().then(data => {
+                    return Promise.reject(new Error(data.message));
+                });
+            } else {
+                return res.json();
+            }
+        })
+        .then(data => {
+            let orders = `<table>`
+            data.forEach(order => {
+                orders += `
             <tr>
                 <th>User: ${order.user}</th>
             </tr>
             `
-        
-            order.products.forEach(product => {
-                orders += `
+
+                order.products.forEach(product => {
+                    orders += `
                 <tr>
                     <td>${product.productId}</td>
                     <td>${product.quantity}</td>
                 </tr>
                 `
+                })
             })
+
+
+
+            data.forEach(user => {
+                console.log(user);
+            });
+
+            orders += `</table>`
+            renderedContent.innerHTML = orders;
         })
-
-
-
-        data.forEach(user => {
-        console.log(user);
-        });
-
-        orders += `</table>`
-        renderedContent.innerHTML = orders;
-    })
-    .catch(error => {
-        console.error("Error:", error.message);
-        renderedContent.innerHTML = `
+        .catch(error => {
+            console.error("Error:", error.message);
+            renderedContent.innerHTML = `
     <p>${error.message}</p>
     `
-    });
+        });
+}
+// Get my orders (user)
+
+let getMyOrdersToken = document.getElementById("getMyOrdersToken");
+
+function getMyOrders() {
+    let user = localStorage.getItem("currentUser");
+    let userOrder = {
+        user: user,
+        token: getMyOrdersToken.value
+    }
+
+    if(user) {
+
+    fetch('http://localhost:3000/api/orders/user', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userOrder)
+    })
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(data => {
+                    return Promise.reject(new Error(data.message));
+                });
+            } else {
+                return res.json();
+            }
+
+        })
+        .then(data => {
+            let orders = `<table>`
+            data.forEach(order => {
+                orders += `
+        <tr>
+            <th>User: ${order.user}</th>
+        </tr>
+        `
+
+                order.products.forEach(product => {
+                    orders += `
+            <tr>
+                <td>${product.productId}</td>
+                <td>${product.quantity}</td>
+            </tr>
+            `
+                })
+            })
+
+            orders += `</table>`
+            renderedContent.innerHTML = orders;
+        })
+        .catch(error => {
+            console.error("Error:", error.message);
+            renderedContent.innerHTML = `
+    <p>${error.message}</p>
+    `
+        });
+
+    } else {
+        renderedContent.innerHTML = `<p>You have to be logged in to see this</p>`
+    }
+
 }
