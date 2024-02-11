@@ -135,10 +135,6 @@ function saveUserFunction(event) {
 
 // Login user
 
-let loginEmail = document.getElementById("loginEmail");
-let loginPassword = document.getElementById("loginPassword");
-let loginForm = document.getElementById("loginForm");
-
 if (localStorage.getItem("currentUser")) {
     loginForm.innerHTML = `
     <button onClick="logout()">Logout</button>
@@ -146,6 +142,10 @@ if (localStorage.getItem("currentUser")) {
 }
 
 function loginUserFunction() {
+
+    let loginEmail = document.getElementById("loginEmail");
+    let loginPassword = document.getElementById("loginPassword");
+    let loginForm = document.getElementById("loginForm");
 
     let user = {
         email: loginEmail.value,
@@ -594,12 +594,15 @@ function getMyOrders() {
 
         })
         .then(data => {
-            let orders = `<table>`
+            let orders = `<table>
+                            <tr>
+                                <th>UserID - ${localStorage.getItem("currentUser")}</th>
+                            </tr>`
             data.forEach(order => {
                 orders += `
-            <tr>
-                <th>User: ${order.user}</th>
-            </tr>
+                <tr>
+                    <td><hr/></td>
+                </tr>
             `
 
                 order.products.forEach(product => {
