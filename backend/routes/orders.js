@@ -12,19 +12,25 @@ router.post('/add', (req, res) => {
         products: []
     }
 
-    req.body.products.forEach(orderProduct => {
+    if (order.user) {
 
-        req.app.locals.db.collection("products").updateOne({_id:new ObjectId(orderProduct.productId)}, {$inc:{lager: - orderProduct.quantity}});
+        req.body.products.forEach(orderProduct => {
 
-        order.products.push({productId: orderProduct.productId, quantity: orderProduct.quantity});
+            req.app.locals.db.collection("products").updateOne({_id:new ObjectId(orderProduct.productId)}, {$inc:{lager: - orderProduct.quantity}});
 
-    });
+            order.products.push({productId: orderProduct.productId, quantity: orderProduct.quantity});
 
-    req.app.locals.db.collection("orders").insertOne(order)
+        });
 
-    delete order._id;
+        req.app.locals.db.collection("orders").insertOne(order)
 
-    res.json(order);
+        delete order._id;
+
+        res.json(order);
+
+    } else {
+        res.status(400).json({message: "You have to login to place an order"})
+    }
 
 });
 
