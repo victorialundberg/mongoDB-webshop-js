@@ -16,7 +16,9 @@
     <main>
         <div id="staticContent">
             <!-----------------------Users------------------------>
-            <button id="getAllUsersBtn">Get all users</button> <hr/>
+            <button id="getAllUsersBtn">Get all users</button><hr/>
+            <input id="allOrdersInput" placeholder="token" type="password">
+            <button id="getAllOrdersBtn">Get all orders</button><hr/>
             <div id="getUser">
                 <input type="text" id="userId">
                 <button id="getUserBtn" type="button">Get user</button>
@@ -30,23 +32,23 @@
             <div id="loginForm">
                 Email<input type="text" id="loginEmail"> <br/>
                 Password<input type="password" id="loginPassword">
-                <button id="loginBtn" type="button">Login</button>
+                <button onClick="loginUserFunction()" type="button">Login</button>
             </div><hr/>
             <!----------------------Products---------------------->
             <button id="getAllProductsBtn">Get all products</button><hr/>
             <div id="addProductForm">
                 Name <input type="text" id="productNameInput"> <br/>
                 Description<input type="text" id="productDescriptionInput"> <br/>
-                Price <input type="text" id="productPriceInput"> <br/>
-                Quantity <input type="text" id="productLagerInput"> <br/>
+                Price <input type="number" id="productPriceInput"> <br/>
+                Quantity <input type="number" id="productLagerInput"> <br/>
                 Category <input type="text" id="productCategoryInput"> <br/>
-                Token <input type="password" id="addProductToken">
+                <input type="password" id="addProductToken" placeholder="token">
                 <button id="addProductBtn">Add product</button>
             </div><hr/>
-            <!------------------------Orders---------------------->
-            <button id="getAllOrdersBtn">Get all orders</button><hr/>
+            <button id="shoppingCartBtn">Shopping cart</button><hr/>
         </div>
         <div id="renderedContent"></div>
     </main>
 </body>
 </html>
+
