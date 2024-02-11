@@ -59,11 +59,13 @@ router.get('/all', (req, res) => {
 
 router.post('/user', (req, res) => {
 
+    let user = req.body.user;
     let token = req.body.token;
+
 
     if (token) {
         if (token == process.env.ADD_PRODUCT_TOKEN) {
-            req.app.locals.db.collection("orders").find().toArray()
+            req.app.locals.db.collection("orders").find({user:user}).toArray()
             .then(orders => {
                 orders.forEach(order => {
                     order.id = order._id;
