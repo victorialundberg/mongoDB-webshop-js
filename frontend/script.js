@@ -188,6 +188,8 @@ function loginUserFunction() {
 
 // Logout user
 
+let getMyOrdersToken = document.getElementById("getMyOrdersToken");
+
 function logout() {
     localStorage.removeItem("currentUser");
     loginForm.innerHTML = `
@@ -198,6 +200,7 @@ function logout() {
     renderedContent.innerHTML = `
     <p>You have been logged out</p>
     `
+    getMyOrdersToken.value = "";
 }
 
 //-----------------------Products----------------------\\
@@ -564,7 +567,7 @@ function getAllOrders() {
 }
 // Get my orders (user)
 
-let getMyOrdersToken = document.getElementById("getMyOrdersToken");
+
 
 function getMyOrders() {
     let user = localStorage.getItem("currentUser");
@@ -594,10 +597,10 @@ function getMyOrders() {
             let orders = `<table>`
             data.forEach(order => {
                 orders += `
-        <tr>
-            <th>User: ${order.user}</th>
-        </tr>
-        `
+            <tr>
+                <th>User: ${order.user}</th>
+            </tr>
+            `
 
                 order.products.forEach(product => {
                     orders += `
@@ -615,9 +618,10 @@ function getMyOrders() {
         .catch(error => {
             console.error("Error:", error.message);
             renderedContent.innerHTML = `
-    <p>${error.message}</p>
-    `
+            <p>${error.message}</p>
+            `
         });
+
 
     } else {
         renderedContent.innerHTML = `<p>You have to be logged in to see this</p>`
