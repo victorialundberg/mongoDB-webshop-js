@@ -51,7 +51,7 @@ GET http://localhost:3000/api/products
 ###
 
 // HÄMTA SPECIFIK PRODUKT
-GET http://localhost:3000/api/products/65bb6fd0f886e4425c39a333
+GET http://localhost:3000/api/products/65c3e87493fc378859cf36de
 
 ###
 
@@ -134,7 +134,7 @@ POST http://localhost:3000/api/orders/user
 Content-Type: application/json
 
 {
-    "user": "65c3a1ae877038a96e18dde7"
+    "user": "65c89a1f0aa1ed0d76fbbd46"
 }
 ###
 
@@ -143,7 +143,7 @@ POST http://localhost:3000/api/orders/user
 Content-Type: application/json
 
 {
-    "user": "65c3a1ae877038a96e18dde7",
+    "user": "65c89a1f0aa1ed0d76fbbd46",
     "token": "1234key1234"
 }
 ###
