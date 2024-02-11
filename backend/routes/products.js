@@ -9,9 +9,9 @@ router.get('/', (req, res) => {
     req.app.locals.db.collection("products").find().toArray()
 
     .then(products => {
-        products.forEach(products => {
-            products.id = products._id;
-            delete products._id;
+        products.forEach(product => {
+            product.id = product._id;
+            delete product._id;
         });
      res.json(products);
     });
@@ -24,6 +24,7 @@ router.get('/:id', (req, res) => {
     req.app.locals.db.collection("products").findOne({_id:new ObjectId(id)})
     .then(product => {
         if (product) {
+            product.id = product._id;
             delete product._id;
             res.json(product);
         } else {
@@ -40,7 +41,7 @@ router.post('/add', (req, res) => {
         name: req.body.name,
         description: req.body.description,
         price: req.body.price,
-        lager: req.body.price,
+        lager: req.body.lager,
         category: req.body.category
     };
 
