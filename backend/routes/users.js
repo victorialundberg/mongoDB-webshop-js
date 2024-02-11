@@ -22,18 +22,29 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
     let id = req.body.id;
 
-    req.app.locals.db.collection("users").findOne({_id:new ObjectId(id)})
-    .then(user => {
-        if (user) {
-            user.id = user._id;
-            delete user._id;
-            res.json(user);
-        } else {
-            res.status(404).json({message: "No user with that id!"})
-        }
+    function isValidId(id) {
+        const idPattern = /^[0-9a-fA-F]{24}$/;
 
-    })
+        return idPattern.test(id);
+    }
 
+    if(isValidId(id)) {
+        req.app.locals.db.collection("users").findOne({_id:new ObjectId(id)})
+        .then(user => {
+            if (user) {
+                user.id = user._id;
+                delete user._id;
+                res.json(user);
+            } else {
+                res.status(404).json({message: "No user with that id!"})
+            }
+            
+    
+        })
+
+    } else {
+        res.status(400).json({message: "Please enter a valid user ID"});
+    }
   
 });
 
